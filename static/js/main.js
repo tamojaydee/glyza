@@ -345,16 +345,20 @@ function addCinemaLoader() {
     // Add loading states to forms
     const submitButtons = document.querySelectorAll('button[type="submit"]');
     submitButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            const form = this.closest('form');
             const originalContent = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-film fa-spin me-2"></i>Loading...';
-            this.disabled = true;
             
-            // Re-enable after form submission attempt
-            setTimeout(() => {
-                this.innerHTML = originalContent;
-                this.disabled = false;
-            }, 2000);
+            // Only show loading if form is valid
+            if (form && form.checkValidity()) {
+                this.innerHTML = '<i class="fas fa-film fa-spin me-2"></i>Loading...';
+                this.disabled = true;
+                
+                // Allow form submission to proceed
+                setTimeout(() => {
+                    form.submit();
+                }, 100);
+            }
         });
     });
 }
