@@ -34,51 +34,67 @@ def login():
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '')
-        confirm_password = request.form.get('confirm_password', '')
-        
-        # Validation
-        if not username or not email or not password:
-            flash('Please fill in all required fields.', 'error')
-            return render_template('register.html')
-        
-        if password != confirm_password:
-            flash('Passwords do not match.', 'error')
-            return render_template('register.html')
-        
-        if len(password) < 6:
-            flash('Password must be at least 6 characters long.', 'error')
-            return render_template('register.html')
-        
-        # Check if user already exists
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists. Please choose a different one.', 'error')
-            return render_template('register.html')
-        
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered. Please use a different email.', 'error')
-            return render_template('register.html')
-        
-        # Create new user
-        user = User(username=username, email=email, name=username)
-        user.set_password(password)
-        
         try:
+            logging.info('Registration attempt started')
+            
+            username = request.form.get('username', '').strip()
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '')
+            confirm_password = request.form.get('confirm_password', '')
+            
+            logging.info(f'Registration data: username={username}, email={email}, password_length={len(password)}')
+            
+            # Validation
+            if not username or not email or not password:
+                logging.warning('Missing required fields')
+                flash('Please fill in all required fields.', 'error')
+                return render_template('register.html')
+            
+            if password != confirm_password:
+                logging.warning('Password mismatch')
+                flash('Passwords do not match.', 'error')
+                return render_template('register.html')
+            
+            if len(password) < 6:
+                logging.warning('Password too short')
+                flash('Password must be at least 6 characters long.', 'error')
+                return render_template('register.html')
+            
+            # Check if user already exists
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user:
+                logging.warning(f'Username {username} already exists')
+                flash('Username already exists. Please choose a different one.', 'error')
+                return render_template('register.html')
+            
+            existing_email = User.query.filter_by(email=email).first()
+            if existing_email:
+                logging.warning(f'Email {email} already registered')
+                flash('Email already registered. Please use a different email.', 'error')
+                return render_template('register.html')
+            
+            # Create new user
+            logging.info('Creating new user')
+            user = User(username=username, email=email, name=username)
+            user.set_password(password)
+            
+            logging.info('Adding user to database')
             db.session.add(user)
             db.session.commit()
+            logging.info('User committed to database successfully')
             
             # Auto-login after registration
             session['user_id'] = user.id
             session['username'] = user.username
             flash(f'Registration successful! Welcome to Pancake Cinema Workflows, {username}! 🎬🥞', 'success')
-            logging.info(f'New user registered: {username}')
+            logging.info(f'New user registered successfully: {username} (ID: {user.id})')
             return redirect(url_for('workflow.dashboard'))
+            
         except Exception as e:
             db.session.rollback()
+            logging.error(f'Registration error: {str(e)}', exc_info=True)
             flash('Registration failed. Please try again.', 'error')
-            logging.error(f'Registration error: {str(e)}')
+            return render_template('register.html')
     
     return render_template('register.html')
 
