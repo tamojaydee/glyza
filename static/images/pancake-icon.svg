@@ -1,0 +1,53 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pancakeGradient" cx="0.5" cy="0.3" r="0.7">
+      <stop offset="0%" style="stop-color:#ffd93d;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffcc02;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e6c200;stop-opacity:1" />
+    </radialGradient>
+    <radialGradient id="syrupGradient" cx="0.5" cy="0.2" r="0.8">
+      <stop offset="0%" style="stop-color:#d4aa00;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#8b4513;stop-opacity:0.9" />
+    </radialGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+  </defs>
+  
+  <!-- Pancake Stack Base -->
+  <ellipse cx="50" cy="75" rx="35" ry="8" fill="url(#pancakeGradient)" filter="url(#shadow)" />
+  
+  <!-- Second Pancake -->
+  <ellipse cx="50" cy="65" rx="32" ry="7" fill="url(#pancakeGradient)" filter="url(#shadow)" />
+  
+  <!-- Top Pancake -->
+  <ellipse cx="50" cy="55" rx="28" ry="6" fill="url(#pancakeGradient)" filter="url(#shadow)" />
+  
+  <!-- Syrup Drip 1 -->
+  <path d="M35 55 Q32 60 30 65 Q28 70 32 72 Q35 70 33 65 Q35 60 35 55" fill="url(#syrupGradient)" />
+  
+  <!-- Syrup Drip 2 -->
+  <path d="M65 55 Q68 58 70 62 Q72 68 68 70 Q65 68 67 63 Q65 58 65 55" fill="url(#syrupGradient)" />
+  
+  <!-- Butter Pat -->
+  <ellipse cx="50" cy="52" rx="8" ry="4" fill="#fff9e6" opacity="0.9" />
+  <ellipse cx="50" cy="51" rx="6" ry="3" fill="#ffd93d" opacity="0.7" />
+  
+  <!-- Steam Lines -->
+  <path d="M42 45 Q43 40 42 35 Q41 30 42 25" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round" />
+  <path d="M50 43 Q51 38 50 33 Q49 28 50 23" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round" />
+  <path d="M58 45 Q59 40 58 35 Q57 30 58 25" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.6" stroke-linecap="round" />
+  
+  <!-- Cinema Film Strip Border -->
+  <rect x="5" y="5" width="90" height="90" fill="none" stroke="#2c3e50" stroke-width="3" rx="10" />
+  
+  <!-- Film Holes -->
+  <circle cx="15" cy="15" r="3" fill="#2c3e50" />
+  <circle cx="85" cy="15" r="3" fill="#2c3e50" />
+  <circle cx="15" cy="85" r="3" fill="#2c3e50" />
+  <circle cx="85" cy="85" r="3" fill="#2c3e50" />
+  
+  <!-- Film Strip Lines -->
+  <line x1="5" y1="25" x2="95" y2="25" stroke="#2c3e50" stroke-width="1" />
+  <line x1="5" y1="75" x2="95" y2="75" stroke="#2c3e50" stroke-width="1" />
+</svg>

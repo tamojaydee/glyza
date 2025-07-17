@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Pancake Cinema Workflows{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="cinema-card auth-card">
+                <div class="text-center mb-4">
+                    <img src="{{ url_for('static', filename='images/pancake-icon.svg') }}" alt="Pancake Cinema" width="80" height="80" class="mb-3">
+                    <h1 class="cinema-title">Welcome Back!</h1>
+                    <p class="text-muted">Sign in to your Pancake Cinema account</p>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                        <input type="text" 
+                               class="form-control cinema-input" 
+                               id="username" 
+                               name="username" 
+                               required 
+                               placeholder="Enter your username">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Password
+                        </label>
+                        <input type="password" 
+                               class="form-control cinema-input" 
+                               id="password" 
+                               name="password" 
+                               required 
+                               placeholder="Enter your password">
+                    </div>
+                    
+                    <button type="submit" class="btn cinema-btn-primary w-100 mb-3">
+                        <i class="fas fa-film me-2"></i>Sign In
+                    </button>
+                </form>
+                
+                <div class="text-center">
+                    <p class="mb-0">Don't have an account?</p>
+                    <a href="{{ url_for('auth.register') }}" class="cinema-link">
+                        <i class="fas fa-user-plus me-1"></i>Create an account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add floating animation to the pancake icon
+    const icon = document.querySelector('img[alt="Pancake Cinema"]');
+    if (icon) {
+        icon.classList.add('floating-pancake');
+    }
+});
+</script>
+{% endblock %}

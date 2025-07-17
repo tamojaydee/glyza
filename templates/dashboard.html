@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Pancake Cinema Workflows{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-header">
+                <h1 class="cinema-title mb-2">
+                    <i class="fas fa-film me-2"></i>
+                    Welcome back, {{ user.name or user.username }}! 🥞
+                </h1>
+                <p class="text-muted">Manage your workflow tasks like a Hollywood production</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ stats.total }}</h3>
+                    <p>Total Tasks</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ stats.pending }}</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon in-progress">
+                    <i class="fas fa-play"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ stats.in_progress }}</h3>
+                    <p>In Progress</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon done">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stats-content">
+                    <h3>{{ stats.done }}</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Task Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="cinema-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Task
+                    </h4>
+                    <button class="btn cinema-btn-outline" type="button" data-bs-toggle="collapse" data-bs-target="#addTaskForm">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                
+                <div class="collapse" id="addTaskForm">
+                    <form method="POST" action="{{ url_for('workflow.add_task') }}">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="title" class="form-label">Task Title</label>
+                                <input type="text" class="form-control cinema-input" id="title" name="title" required placeholder="Enter task title">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-select cinema-input" id="priority" name="priority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="due_date" class="form-label">Due Date</label>
+                                <input type="date" class="form-control cinema-input" id="due_date" name="due_date">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control cinema-input" id="description" name="description" rows="3" placeholder="Task description (optional)"></textarea>
+                        </div>
+                        <button type="submit" class="btn cinema-btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add Task
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter and Search -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h4 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Your Tasks
+                </h4>
+                <div class="d-flex gap-2 flex-wrap">
+                    <form method="GET" class="d-flex gap-2 align-items-center">
+                        <input type="text" 
+                               class="form-control cinema-input" 
+                               name="search" 
+                               placeholder="Search tasks..." 
+                               value="{{ search_query }}"
+                               style="width: 200px;">
+                        <select class="form-select cinema-input" name="status" style="width: 150px;">
+                            <option value="all" {% if current_filter == 'all' %}selected{% endif %}>All Status</option>
+                            <option value="pending" {% if current_filter == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="in-progress" {% if current_filter == 'in-progress' %}selected{% endif %}>In Progress</option>
+                            <option value="done" {% if current_filter == 'done' %}selected{% endif %}>Completed</option>
+                        </select>
+                        <button type="submit" class="btn cinema-btn-outline">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tasks List -->
+    <div class="row">
+        {% if tasks %}
+            {% for task in tasks %}
+            <div class="col-lg-6 mb-3">
+                <div class="task-card status-{{ task.status }}">
+                    <div class="task-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5 class="task-title mb-1">{{ task.title }}</h5>
+                            <div class="task-actions">
+                                <button class="btn btn-sm cinema-btn-outline" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editTask{{ task.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('workflow.delete_task', task_id=task.id) }}" class="d-inline">
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Are you sure you want to delete this task?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="task-meta">
+                            <span class="badge task-status-badge status-{{ task.status }}">
+                                {% if task.status == 'pending' %}
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                {% elif task.status == 'in-progress' %}
+                                    <i class="fas fa-play me-1"></i>In Progress
+                                {% else %}
+                                    <i class="fas fa-check me-1"></i>Completed
+                                {% endif %}
+                            </span>
+                            <span class="badge priority-{{ task.priority }}">{{ task.priority|title }}</span>
+                            {% if task.due_date %}
+                                <span class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>{{ task.due_date.strftime('%Y-%m-%d') }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if task.description %}
+                    <div class="task-description">
+                        <p class="mb-2">{{ task.description }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="task-footer">
+                        <small class="text-muted">
+                            Created: {{ task.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% if task.updated_at != task.created_at %}
+                                | Updated: {{ task.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Edit Task Modal -->
+            <div class="modal fade" id="editTask{{ task.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Task</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="POST" action="{{ url_for('workflow.update_task', task_id=task.id) }}">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="edit_title{{ task.id }}" class="form-label">Task Title</label>
+                                    <input type="text" 
+                                           class="form-control cinema-input" 
+                                           id="edit_title{{ task.id }}" 
+                                           name="title" 
+                                           value="{{ task.title }}" 
+                                           required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit_status{{ task.id }}" class="form-label">Status</label>
+                                        <select class="form-select cinema-input" id="edit_status{{ task.id }}" name="status">
+                                            <option value="pending" {% if task.status == 'pending' %}selected{% endif %}>Pending</option>
+                                            <option value="in-progress" {% if task.status == 'in-progress' %}selected{% endif %}>In Progress</option>
+                                            <option value="done" {% if task.status == 'done' %}selected{% endif %}>Completed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit_priority{{ task.id }}" class="form-label">Priority</label>
+                                        <select class="form-select cinema-input" id="edit_priority{{ task.id }}" name="priority">
+                                            <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Low</option>
+                                            <option value="medium" {% if task.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                            <option value="high" {% if task.priority == 'high' %}selected{% endif %}>High</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit_due_date{{ task.id }}" class="form-label">Due Date</label>
+                                        <input type="date" 
+                                               class="form-control cinema-input" 
+                                               id="edit_due_date{{ task.id }}" 
+                                               name="due_date" 
+                                               value="{% if task.due_date %}{{ task.due_date.strftime('%Y-%m-%d') }}{% endif %}">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit_description{{ task.id }}" class="form-label">Description</label>
+                                    <textarea class="form-control cinema-input" 
+                                              id="edit_description{{ task.id }}" 
+                                              name="description" 
+                                              rows="3">{{ task.description or '' }}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn cinema-btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="empty-state text-center py-5">
+                    <img src="{{ url_for('static', filename='images/pancake-icon.svg') }}" alt="No tasks" width="100" height="100" class="mb-3 opacity-50">
+                    <h4 class="text-muted">No tasks found</h4>
+                    <p class="text-muted">
+                        {% if search_query or current_filter != 'all' %}
+                            Try adjusting your search or filter criteria.
+                        {% else %}
+                            Start by adding your first task above! 🎬
+                        {% endif %}
+                    </p>
+                    {% if search_query or current_filter != 'all' %}
+                        <a href="{{ url_for('workflow.dashboard') }}" class="btn cinema-btn-outline">
+                            <i class="fas fa-undo me-2"></i>Clear Filters
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-expand add task form if no tasks exist
+    {% if not tasks and not search_query and current_filter == 'all' %}
+        const addTaskForm = document.getElementById('addTaskForm');
+        if (addTaskForm) {
+            new bootstrap.Collapse(addTaskForm, { show: true });
+        }
+    {% endif %}
+    
+    // Set minimum date for due date inputs to today
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    const today = new Date().toISOString().split('T')[0];
+    dateInputs.forEach(input => {
+        input.min = today;
+    });
+});
+</script>
+{% endblock %}

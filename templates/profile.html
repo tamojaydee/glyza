@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ user.name or user.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Profile Header -->
+        <div class="col-12 mb-4">
+            <div class="cinema-card">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        <img src="{{ user.get_avatar_url() }}" 
+                             alt="Profile Avatar" 
+                             class="profile-avatar mb-3">
+                        <h4 class="cinema-title">{{ user.name or user.username }}</h4>
+                        <p class="text-muted">@{{ user.username }}</p>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="profile-info">
+                            <h2 class="mb-3">
+                                <i class="fas fa-user-circle me-2"></i>Profile Information
+                            </h2>
+                            {% if user.bio %}
+                                <p class="lead">{{ user.bio }}</p>
+                            {% else %}
+                                <p class="text-muted">No bio available. Add one below!</p>
+                            {% endif %}
+                            <div class="profile-details">
+                                <p><strong>Email:</strong> {{ user.email }}</p>
+                                <p><strong>Member since:</strong> {{ user.created_at.strftime('%B %Y') }}</p>
+                                <p><strong>Total tasks:</strong> {{ user.tasks|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Edit Profile -->
+        <div class="col-lg-6 mb-4">
+            <div class="cinema-card">
+                <h4 class="mb-3">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </h4>
+                
+                <form method="POST" action="{{ url_for('profile.edit_profile') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" 
+                               class="form-control cinema-input" 
+                               id="name" 
+                               name="name" 
+                               value="{{ user.name or '' }}" 
+                               required 
+                               placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" 
+                               class="form-control cinema-input" 
+                               id="email" 
+                               name="email" 
+                               value="{{ user.email }}" 
+                               required 
+                               placeholder="Enter your email">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="avatar_url" class="form-label">Avatar URL</label>
+                        <input type="url" 
+                               class="form-control cinema-input" 
+                               id="avatar_url" 
+                               name="avatar_url" 
+                               value="{{ user.avatar_url or '' }}" 
+                               placeholder="https://example.com/avatar.jpg">
+                        <div class="form-text">
+                            Leave blank to use the default pancake avatar 🥞
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control cinema-input" 
+                                  id="bio" 
+                                  name="bio" 
+                                  rows="4" 
+                                  placeholder="Tell us about yourself...">{{ user.bio or '' }}</textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn cinema-btn-primary">
+                        <i class="fas fa-save me-2"></i>Update Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Change Password -->
+        <div class="col-lg-6 mb-4">
+            <div class="cinema-card">
+                <h4 class="mb-3">
+                    <i class="fas fa-lock me-2"></i>Change Password
+                </h4>
+                
+                <form method="POST" action="{{ url_for('profile.change_password') }}">
+                    <div class="mb-3">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" 
+                               class="form-control cinema-input" 
+                               id="current_password" 
+                               name="current_password" 
+                               required 
+                               placeholder="Enter current password">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" 
+                               class="form-control cinema-input" 
+                               id="new_password" 
+                               name="new_password" 
+                               required 
+                               minlength="6"
+                               placeholder="Enter new password (min 6 characters)">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" 
+                               class="form-control cinema-input" 
+                               id="confirm_password" 
+                               name="confirm_password" 
+                               required 
+                               placeholder="Confirm new password">
+                    </div>
+                    
+                    <button type="submit" class="btn cinema-btn-primary">
+                        <i class="fas fa-key me-2"></i>Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Account Actions -->
+        <div class="col-12">
+            <div class="cinema-card">
+                <h4 class="mb-3">
+                    <i class="fas fa-cog me-2"></i>Account Actions
+                </h4>
+                
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('workflow.dashboard') }}" class="btn cinema-btn-outline">
+                        <i class="fas fa-tachometer-alt me-2"></i>Back to Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password confirmation validation
+    const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    function validatePassword() {
+        if (newPassword.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity('Passwords do not match');
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+    
+    if (newPassword && confirmPassword) {
+        newPassword.addEventListener('change', validatePassword);
+        confirmPassword.addEventListener('keyup', validatePassword);
+    }
+    
+    // Avatar URL preview
+    const avatarInput = document.getElementById('avatar_url');
+    const avatarImg = document.querySelector('.profile-avatar');
+    
+    if (avatarInput && avatarImg) {
+        avatarInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                // Test if the URL loads successfully
+                const testImg = new Image();
+                testImg.onload = function() {
+                    avatarImg.src = avatarInput.value;
+                };
+                testImg.onerror = function() {
+                    // Revert to default if URL is invalid
+                    avatarImg.src = '/static/images/pancake-icon.svg';
+                };
+                testImg.src = this.value;
+            } else {
+                avatarImg.src = '/static/images/pancake-icon.svg';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
